@@ -1,5 +1,5 @@
 FROM docker.io/ubuntu:20.04
-LABEL org.opencontainers.image.source https://github.com/OrangeAppsRu/db-connect
+LABEL org.opencontainers.image.source https://github.com/orangeappsru/db-connect
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
