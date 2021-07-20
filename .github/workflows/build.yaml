@@ -1,0 +1,41 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*.*.*'
+jobs:
+  docker-build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Set env
+        env:
+          IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "IS_TAG=${IS_TAG}"
+          if [[ $(echo ${GITHUB_REF#refs/heads/}) == "master" ]]
+          then
+            echo "RELEASE_VERSION=latest" >> $GITHUB_ENV
+          elif [[ $(echo ${GITHUB_REF#refs/heads/}) == "develop" ]] 
+          then
+            echo "RELEASE_VERSION=latest-develop" >> $GITHUB_ENV 
+          elif [[ ${IS_TAG} == "false" ]]
+          then
+            echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          else 
+            echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+          fi
+      - name: Publish tag to registry
+        env:
+          IMAGE: ${{ github.repository }}
+          GITHUB_USER: ${{ secrets.GH_USER }}
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
+        run: |
+          image=`echo -n "${IMAGE}" | tr 'A-Z' 'a-z'`
+          echo "${image}:${RELEASE_VERSION}"
+          
+          docker build -t ghcr.io/${image}:${RELEASE_VERSION} .
+          docker login -u "${GITHUB_USER}" -p "${GITHUB_TOKEN}" ghcr.io
+          docker push ghcr.io/${image}:${RELEASE_VERSION}
