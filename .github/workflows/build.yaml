@@ -5,9 +5,13 @@ on:
       - master
     tags:
       - 'v*.*.*'
+permissions:
+  packages: write
 jobs:
   docker-build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+        packages: write
     steps:
       - uses: actions/checkout@master
       - name: Set env
@@ -27,11 +31,12 @@ jobs:
           else 
             echo "RELEASE_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
           fi
+
       - name: Publish tag to registry
         env:
           IMAGE: ${{ github.repository }}
-          GITHUB_USER: ${{ secrets.GH_USER }}
-          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_TOKEN }}
+          GITHUB_USER: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           image=`echo -n "${IMAGE}" | tr 'A-Z' 'a-z'`
           echo "${image}:${RELEASE_VERSION}"
