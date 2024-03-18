@@ -15,6 +15,7 @@ shopt -s histappend
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTFILESIZE=99999999
 HISTSIZE=99999
+export HISTIGNORE="*AWS*:*SECRET*:*TOKEN*:*CREDENTIALS*:*PASS*:"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
