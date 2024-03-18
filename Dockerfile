@@ -9,6 +9,7 @@ RUN apt-get update \
         dnsutils \
         nano \
         tmux \
+        screen \
         curl \
         ca-certificates \
         mysql-client \
@@ -29,7 +30,8 @@ RUN apt-get update \
     && mkdir /user
 
 COPY ./.bash_profile /user/
-RUN chmod 755 /user; chmod 755 /user/.bash_profile
+COPY ./.tmux.conf /user/
+RUN chmod 755 /user; chmod 755 /user/.bash_profile; chmod 644 /user/.tmux.conf
 COPY ./entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
